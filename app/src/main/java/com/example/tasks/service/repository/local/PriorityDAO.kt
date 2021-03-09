@@ -10,6 +10,9 @@ interface PriorityDAO {
     @Insert
     fun save(list: List<PriorityModel>)
 
+    @androidx.room.Query("SELECT * FROM priority")
+    fun list():List<PriorityModel>
+
    @androidx.room.Query("DELETE FROM priority")
     fun clear()
 }
