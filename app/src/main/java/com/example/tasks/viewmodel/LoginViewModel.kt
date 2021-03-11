@@ -11,6 +11,7 @@ import com.example.tasks.service.listener.ValidationListener
 import com.example.tasks.service.repository.PersonRepository
 import com.example.tasks.service.repository.PriorityRepository
 import com.example.tasks.service.repository.local.SecurityPreferences
+import com.example.tasks.service.repository.remote.RetrofitClient
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val mPersonRepository = PersonRepository(application)
@@ -33,6 +34,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 mSharedPreferences.store(TaskConstants.SHARED.PERSON_KEY, model.personKey)
                 mSharedPreferences.store(TaskConstants.SHARED.PERSON_NAME, model.name)
 
+                RetrofitClient.addHeader(model.token, model.personKey)
+
                 mLogin.value = ValidationListener()
             }
 
@@ -51,6 +54,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         val token = mSharedPreferences.get(TaskConstants.SHARED.TOKEN_KEY)
         val person = mSharedPreferences.get(TaskConstants.SHARED.PERSON_KEY)
         val logged = (token!= "" && person != "")
+
+        RetrofitClient.addHeader(token, person)
 
         if (!logged){
             mPriorityRepository.all()
