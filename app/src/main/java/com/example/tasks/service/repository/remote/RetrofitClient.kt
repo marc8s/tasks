@@ -18,7 +18,7 @@ class RetrofitClient private constructor(){
 
         private fun getRetrofitInstance() : Retrofit{
             val httpClient = OkHttpClient.Builder()
-           /* httpClient.addInterceptor(object : Interceptor{
+            httpClient.addInterceptor(object : Interceptor{
                 override fun intercept(chain: Interceptor.Chain): Response {
                     val request =
                         chain.request()
@@ -30,7 +30,7 @@ class RetrofitClient private constructor(){
 
                 }
 
-            })*/
+            })
 
             if(!Companion::retrofit.isInitialized){
                 retrofit = Retrofit.Builder()
