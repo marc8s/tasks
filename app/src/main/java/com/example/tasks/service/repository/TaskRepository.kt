@@ -52,6 +52,29 @@ class TaskRepository(val context: Context) {
         val call: Call<List<TaskModel>> = mRemote.overdue()
         list(call, listener)
     }
+    fun updateStatus(id:Int, complete: Boolean, listener: APIListener<Boolean>){
+        var call = if(complete){
+            mRemote.complete(id)
+        }else{
+            mRemote.undo(id)
+        }
+        call.enqueue(object : Callback<Boolean>{
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                listener.onFailure(context.getString(R.string.ERROR_UNEXPECTED))
+            }
+
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if(response.code()!= TaskConstants.HTTP.SUCCESS){
+                    //converter mensagem do gson para uma string
+                    val validation = Gson().fromJson(response.errorBody()!!.string(), String::class.java)
+                    listener.onFailure(validation)
+                }else{
+                    response.body()?.let { listener.onSuccess(it) }
+                }
+            }
+
+        })
+    }
 
     fun create(task:TaskModel, listener:APIListener<Boolean>){
         val call: Call<Boolean> =
@@ -117,4 +140,26 @@ class TaskRepository(val context: Context) {
         })
 
     }
+
+    fun delete(id:Int, listener:APIListener<Boolean>){
+        val call: Call<Boolean> = mRemote.delete(id)
+        call.enqueue(object : Callback<Boolean>{
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                listener.onFailure(context.getString(R.string.ERROR_UNEXPECTED))
+            }
+
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if(response.code()!= TaskConstants.HTTP.SUCCESS){
+                    //converter mensagem do gson para uma string
+                    val validation = Gson().fromJson(response.errorBody()!!.string(), String::class.java)
+                    listener.onFailure(validation)
+                }else{
+                    response.body()?.let { listener.onSuccess(it) }
+                }
+            }
+
+        })
+
+    }
+
 }
