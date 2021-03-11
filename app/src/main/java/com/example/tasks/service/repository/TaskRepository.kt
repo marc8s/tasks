@@ -75,6 +75,28 @@ class TaskRepository(val context: Context) {
 
     }
 
+    fun update(task:TaskModel, listener:APIListener<Boolean>){
+        val call: Call<Boolean> =
+            mRemote.update(task.id, task.priorityId, task.description, task.dueDate, task.complete)
+        call.enqueue(object : Callback<Boolean>{
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                listener.onFailure(context.getString(R.string.ERROR_UNEXPECTED))
+            }
+
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if(response.code()!= TaskConstants.HTTP.SUCCESS){
+                    //converter mensagem do gson para uma string
+                    val validation = Gson().fromJson(response.errorBody()!!.string(), String::class.java)
+                    listener.onFailure(validation)
+                }else{
+                    response.body()?.let { listener.onSuccess(it) }
+                }
+            }
+
+        })
+
+    }
+
     fun load(id:Int, listener:APIListener<TaskModel>){
         val call: Call<TaskModel> = mRemote.load(id)
         call.enqueue(object : Callback<TaskModel>{
