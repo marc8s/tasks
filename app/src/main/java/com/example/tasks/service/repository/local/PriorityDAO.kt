@@ -13,6 +13,9 @@ interface PriorityDAO {
     @androidx.room.Query("SELECT * FROM priority")
     fun list():List<PriorityModel>
 
+    @androidx.room.Query("SELECT description FROM priority WHERE id = :id")
+    fun getDescription(id:Int):String
+
    @androidx.room.Query("DELETE FROM priority")
     fun clear()
 }
